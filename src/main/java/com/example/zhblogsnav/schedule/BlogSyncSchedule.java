@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -34,13 +35,16 @@ public class BlogSyncSchedule {
 
     private RabbitTemplate rabbitTemplate;
 
+    private JmsMessagingTemplate jmsMessagingTemplate;
+
     private KafkaTemplate<String, String> kafkaTemplate;
 
     public BlogSyncSchedule(BlogRepository blogRepository, StringRedisTemplate stringRedisTemplate, RabbitTemplate rabbitTemplate,
-    KafkaTemplate<String, String> kafkaTemplate) {
+                            JmsMessagingTemplate jmsMessagingTemplate, KafkaTemplate<String, String> kafkaTemplate) {
         this.blogRepository = blogRepository;
         this.stringRedisTemplate = stringRedisTemplate;
         this.rabbitTemplate = rabbitTemplate;
+        this.jmsMessagingTemplate = jmsMessagingTemplate;
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -77,6 +81,24 @@ public class BlogSyncSchedule {
             LOGGER.info("==========sync blog to rabbitmq end,size:{},cost:{}ms==========", allBlog.size(), (end - start));
         } catch (Exception e) {
             LOGGER.error("blogSync2Rabbitmq error:", e);
+        }
+    }
+
+    @Scheduled(cron = "${blog.sync.activemq.cron}")
+    public void blogSync2Activemq() {
+        try {
+            LOGGER.info("==========start sync blog to activemq==========");
+            long start = System.currentTimeMillis();
+            List<Blog> allBlog = blogRepository.findAll();
+            for (Blog blog : allBlog) {
+                CorrelationData correlationData = new CorrelationData();
+                correlationData.setId(blog.getId());
+                jmsMessagingTemplate.convertAndSend(CommonConst.BLOG_ACTIVEMQ_CONSUMER_QUEUE, MAPPER.writeValueAsString(blog));
+            }
+            long end = System.currentTimeMillis();
+            LOGGER.info("==========sync blog to activemq end,size:{},cost:{}ms==========", allBlog.size(), (end - start));
+        } catch (Exception e) {
+            LOGGER.error("blogSync2Activemq error:", e);
         }
     }
 

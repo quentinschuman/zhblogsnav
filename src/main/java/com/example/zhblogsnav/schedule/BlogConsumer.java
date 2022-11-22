@@ -10,6 +10,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -70,6 +71,20 @@ public class BlogConsumer {
             LOGGER.info("==========consume blog from rabbitmq end,cost:{}ms==========", (end - start));
         } catch (Exception e) {
             LOGGER.error("blogConsumeFromRabbitmq error:", e);
+        }
+    }
+
+    @JmsListener(destination = CommonConst.BLOG_ACTIVEMQ_CONSUMER_QUEUE, containerFactory = "jmsQueueListener")
+    public void blogConsumeFromActivemq(Message message) {
+        try {
+            LOGGER.info("==========start consume blog from activemq==========");
+            long start = System.currentTimeMillis();
+            String blogStr = new String(message.getBody(), "utf-8");
+            LOGGER.info("blogConsumeFromActivemq:{}", blogStr);
+            long end = System.currentTimeMillis();
+            LOGGER.info("==========consume blog from activemq end,cost:{}ms==========", (end - start));
+        } catch (Exception e) {
+            LOGGER.error("blogConsumeFromActivemq error:", e);
         }
     }
 

@@ -12,9 +12,11 @@ public class CommonConst {
 
     public static final String BLOG_RABBITMQ_EXCHANGE = "blog_sync";
 
-    public static final String BLOG_RABBITMQ_ROUTINGKEY = "schedule";
+    public static final String BLOG_RABBITMQ_ROUTINGKEY = "schedule_rabbitmq";
 
-    public static final String BLOG_RABBITMQ_CONSUMER_QUEUE = "schedule.consumer";
+    public static final String BLOG_RABBITMQ_CONSUMER_QUEUE = "rabbit.schedule.consumer";
+
+    public static final String BLOG_ACTIVEMQ_CONSUMER_QUEUE = "active.schedule.consumer";
 
     public static final String BLOG_KAFKA_TOPIC = "BLOG_SYNC";
 }

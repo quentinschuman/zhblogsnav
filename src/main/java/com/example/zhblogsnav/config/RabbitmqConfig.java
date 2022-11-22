@@ -55,7 +55,7 @@ public class RabbitmqConfig {
     }
 
     @Bean
-    CachingConnectionFactory rabbitConnectionFactory() {
+    CachingConnectionFactory rabbitmqConnectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         factory.setHost(host);
         factory.setPort(port);
@@ -70,7 +70,7 @@ public class RabbitmqConfig {
 
     @Bean
     RabbitTemplate rabbitTemplate() {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(rabbitConnectionFactory());
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(rabbitmqConnectionFactory());
         rabbitTemplate.setMandatory(true);
         rabbitTemplate.setUsePublisherConnection(true);
         return rabbitTemplate;
