@@ -33,12 +33,9 @@ public class BlogConsumer {
 
     private StringRedisTemplate stringRedisTemplate;
 
-    private RabbitTemplate rabbitTemplate;
-
-    public BlogConsumer(BlogRepository blogRepository, StringRedisTemplate stringRedisTemplate, RabbitTemplate rabbitTemplate) {
+    public BlogConsumer(BlogRepository blogRepository, StringRedisTemplate stringRedisTemplate) {
         this.blogRepository = blogRepository;
         this.stringRedisTemplate = stringRedisTemplate;
-        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Scheduled(cron = "${blog.consumer.redis.cron}")
@@ -75,12 +72,11 @@ public class BlogConsumer {
     }
 
     @JmsListener(destination = CommonConst.BLOG_ACTIVEMQ_CONSUMER_QUEUE, containerFactory = "jmsQueueListener")
-    public void blogConsumeFromActivemq(Message message) {
+    public void blogConsumeFromActivemq(String message) {
         try {
             LOGGER.info("==========start consume blog from activemq==========");
             long start = System.currentTimeMillis();
-            String blogStr = new String(message.getBody(), "utf-8");
-            LOGGER.info("blogConsumeFromActivemq:{}", blogStr);
+            LOGGER.info("blogConsumeFromActivemq:{}", message);
             long end = System.currentTimeMillis();
             LOGGER.info("==========consume blog from activemq end,cost:{}ms==========", (end - start));
         } catch (Exception e) {

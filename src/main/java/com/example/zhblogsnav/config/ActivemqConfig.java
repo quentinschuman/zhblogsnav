@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-import org.springframework.jms.config.JmsListenerContainerFactory;
-import org.springframework.jms.config.SimpleJmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.jms.support.destination.DestinationResolver;
@@ -114,13 +112,6 @@ public class ActivemqConfig {
         connectionFactory.setRedeliveryPolicy(redeliveryPolicy);
 
         return connectionFactory;
-    }
-
-    @Bean
-    JmsListenerContainerFactory activemqConnectionFactory(ConnectionFactory connectionFactory) {
-        SimpleJmsListenerContainerFactory factory = new SimpleJmsListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        return factory;
     }
 
     @Bean
